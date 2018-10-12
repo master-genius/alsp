@@ -7,7 +7,7 @@
 #define TANK_TY_PRIZE   'p'
 #define TANK_TY_ENEMY   'e'
 #define TANK_TY_SHIEL   's'
-#define TANK_TY_ROAD    'r'
+#define TANK_TY_WALL    'r'
 
 #define BOMB_A      '.'
 #define BOMB_B      'o'
@@ -38,7 +38,7 @@ struct TRoot {
 
 struct Armour {
     struct TRoot *tr;
-    
+
     char *body[];
 
     int body_end; //身体最大行截至
@@ -52,13 +52,17 @@ struct Armour {
     int speed;  //移动速度
 
     int power;  //自身威力值
-}
+
+    int cur_row;
+    int cur_col;
+
+};
 
 #define BODY_LINE   16
 
 struct Tank {
     struct Armour * ar;
-    
+
     char *body_up[];
     int body_up_end;
 
@@ -74,8 +78,6 @@ struct Tank {
     char cur_ori; //当前方向
 
 
-
-
 };
 
 struct Aircraft {
@@ -88,4 +90,3 @@ struct Aircraft {
 
 
 #endif
-

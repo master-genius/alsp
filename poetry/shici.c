@@ -147,6 +147,7 @@ start_out:;
             fflush(stdout);
             col += width;
             usleep(100000);
+            winsize(ws);
         }
         row++;
         if (row > ws[0])

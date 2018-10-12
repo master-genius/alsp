@@ -110,7 +110,7 @@ int main(int argc, char *argv[]) {
 
     if (argc > 1) {
         delay = atoi(argv[1]);
-        if (delay < 10000 || delay > 999999) {
+        if (delay < 5000 || delay > 999999) {
             delay = DEF_DELAY;
         }
     }
