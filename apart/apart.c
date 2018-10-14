@@ -8,7 +8,7 @@
 
 #define APART_MAX_SIZE       8192
 
-#define TEXT_MAX_SIZE        65536
+#define TEXT_MAX_SIZE        16384
 
 #define APART_MAX       64
 
@@ -22,6 +22,21 @@
 
 #define ARGS_END        6
 
+
+#define HELP_INFO   "\
+    apart : 分割字符串命令\n\
+        主要用于脚本处理时分割字符串并提取指定列的情况，awk很强大，不仅仅是分割文本这么简单，\n\
+        但是awk使用过于复杂，初学者需要花费很多时间，此命令十分简单，仅仅是分割一段文本。\n\
+        一行字符串长度不能超过16384，分割最大支持64列。\n\
+\n\
+        -d '[STRING]' : 指定要对文本分割的子串。\n\
+        -n            : 处理一行之后输出换行，默认是不换行的。\n\
+        -f [NUMBER]   : 指定要输出的列\n\
+    example:\n\
+        ps -e -o user,pid,ppid,comm | egrep 'root.*nginx' | apart -d ' ' -f 2\n\
+"
+
+
 char __args[ARGS_END]   = {'\0'};
 unsigned int __col_apart[APART_MAX+1] = {0,};
 
@@ -32,7 +47,7 @@ void * apart_add(void*data, void*idata) {
 
 
 int apart_text(struct vnode_list *vh, char *text, char *t) {
-    
+
     char *find;
 
     find = strtok(text, t);
@@ -51,15 +66,22 @@ void out_apart(struct vnode_list *vh) {
         if (i <= APART_MAX && __col_apart[i] == 1) {
             printf("%s ", (char *)v->data);
         }
-        i++;    
+        i++;
         v = v->next;
     }
     if (__args[ARGS_NEXTLINE])
         printf("\n");
 }
 
+void help(){
+    printf("%s\n", HELP_INFO);
+}
 
 int main(int argc, char *argv[]) {
+
+    if (argc < 2) {
+        help(); return 0;
+    }
 
     struct vnode_list vh;
     vnode_list_init(&vh);
@@ -79,15 +101,28 @@ int main(int argc, char *argv[]) {
     int apart_ind = 0;
     char *t = NULL;
     int count;
+    char *field;
     for(int i=1; i<argc; i++) {
-        if (argv[i][0] == 'F') {
-            apart_ind = atoi(argv[i]+1);
-            if (apart_ind <=0 || apart_ind > APART_MAX ) {
-
+        if (strcmp(argv[i], "-h") == 0) {
+            help(); return 0;
+        }
+        else if (strcmp(argv[i], "-f") == 0) {
+            i++;
+            if (i >= argc) {
+                dprintf(2, "Error: no fields\n");
                 return -1;
             }
-            __col_apart[apart_ind] = 1;
-            count ++;
+            field = strtok(argv[i], ",");
+            while(field) {
+                apart_ind = atoi(field);
+                if (apart_ind <=0 || apart_ind > APART_MAX ) {
+                    dprintf(2, "Error: field out of limits\n");
+                    return -1;
+                }
+                __col_apart[apart_ind] = 1;
+                count ++;
+                field = strtok(NULL, ",");
+            }
         } else if (strcmp(argv[i], "-d") == 0) {
             if (t) {
                 dprintf(2, "Error: already set delim char\n");
