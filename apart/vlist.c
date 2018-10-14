@@ -44,6 +44,7 @@ vnode_list_add(struct vnode_list * vhnode,
         perror("malloc");
         return NULL;
     }
+    
     if (data_size <= 0)
         ptmp->data = idata;
     else {
@@ -54,7 +55,6 @@ vnode_list_add(struct vnode_list * vhnode,
             return NULL;
         }
     }
-
 
     vhnode->last->next = ptmp;
     ptmp->next = NULL;

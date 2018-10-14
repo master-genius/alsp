@@ -10,7 +10,7 @@ struct vnode_list {
     struct vnode_list *next;
     struct vnode_list *prev;
     struct vnode_list *last;
-}vnode_list;
+};
 
 struct vnode_list *
 vnode_list_init(struct vnode_list* vhnode);
