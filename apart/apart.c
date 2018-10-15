@@ -20,6 +20,7 @@
 #define ARGS_COMCHR     1
 #define ARGS_FROMTO     2
 #define ARGS_NEXTLINE   3
+#define ARGS_JOIN       4
 
 #define ARGS_END        6
 
@@ -35,13 +36,16 @@
         -D '[STRING]' : 指定要对文本分割的字串。（和高级语言提供的分割类似）\n\
         -n            : 处理一行之后输出换行，默认是不换行的。\n\
         -f [NUMBER]   : 指定要输出的列\n\
+        -j [CHAR]     : 指定要使用的连接字符，默认为空会把所有列连接成一个字符串\n\
     example:\n\
         ps -e -o user,pid,ppid,comm | egrep 'root.*nginx' | apart -d ' ' -f 2\n\
+        echo 123abc234abc345abc456 | apart -D 'abc' -j '-' -f 1,2,3\n\
 "
 
 
 char __args[ARGS_END]   = {'\0'};
 unsigned int __col_apart[APART_MAX+1] = {0,};
+int __max_field = 1;
 
 
 void * apart_add(void*data, void*idata) {
@@ -74,7 +78,7 @@ void out_apart(struct vnode_list *vh) {
     int i=1;
     while(v) {
         if (i <= APART_MAX && __col_apart[i] == 1) {
-            printf("%s ", (char *)v->data);
+            printf("%s%c", (char *)v->data, (v->next == NULL || i==__max_field)?'\0':__args[ARGS_JOIN]);
         }
         i++;
         v = v->next;
@@ -116,8 +120,15 @@ int main(int argc, char *argv[]) {
     for(int i=1; i<argc; i++) {
         if (strcmp(argv[i], "-h") == 0) {
             help(); return 0;
-        }
-        else if (strcmp(argv[i], "-f") == 0) {
+        }else if (strcmp(argv[i], "-j") == 0) {
+            i += 1;
+            if (i >= argc) {
+                dprintf(2, "Error: less join char\n");
+                return -1;
+            }
+            __args[ARGS_JOIN] = argv[i][0];
+            continue;
+        } else if (strcmp(argv[i], "-f") == 0) {
             i++;
             if (i >= argc) {
                 dprintf(2, "Error: no fields\n");
@@ -130,6 +141,8 @@ int main(int argc, char *argv[]) {
                     dprintf(2, "Error: field out of limits\n");
                     return -1;
                 }
+                if (__max_field < apart_ind)
+                    __max_field = apart_ind;
                 __col_apart[apart_ind] = 1;
                 count ++;
                 field = strtok(NULL, ",");
