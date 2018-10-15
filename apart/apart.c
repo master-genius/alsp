@@ -5,6 +5,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include "vlist.h"
+#include "split.h"
 
 #define APART_MAX_SIZE       8192
 
@@ -22,14 +23,16 @@
 
 #define ARGS_END        6
 
+#define APART_SPLIT     1
 
 #define HELP_INFO   "\
     apart : 分割字符串命令\n\
         主要用于脚本处理时分割字符串并提取指定列的情况，awk很强大，不仅仅是分割文本这么简单，\n\
         但是awk使用过于复杂，初学者需要花费很多时间，此命令十分简单，仅仅是分割一段文本。\n\
         一行字符串长度不能超过16384，分割最大支持64列。\n\
-\n\
-        -d '[STRING]' : 指定要对文本分割的子串。\n\
+        \n\
+        -d '[STRING]' : 指定要对文本分割的字符集。（在其中的字符都符合要求）\n\
+        -D '[STRING]' : 指定要对文本分割的字串。（和高级语言提供的分割类似）\n\
         -n            : 处理一行之后输出换行，默认是不换行的。\n\
         -f [NUMBER]   : 指定要输出的列\n\
     example:\n\
@@ -46,15 +49,22 @@ void * apart_add(void*data, void*idata) {
 }
 
 
-int apart_text(struct vnode_list *vh, char *text, char *t) {
+int apart_text(struct vnode_list *vh, char *text, char *t, int flag) {
 
     char *find;
 
-    find = strtok(text, t);
+    char *(*split_func)(char *, const char *);
+    split_func = strtok;
+
+    if (flag == APART_SPLIT) {
+        split_func = split;
+    }
+
+    find = split_func(text, t);
     while (find) {
         if (vnode_list_add(vh, 0, (void*)find, NULL) == NULL)
             return -1;
-        find = strtok(NULL, t);
+        find = split_func(NULL, t);
     }
     return 0;
 }
@@ -98,6 +108,7 @@ int main(int argc, char *argv[]) {
     else
         return 0;
 
+    int split_flag = 0;
     int apart_ind = 0;
     char *t = NULL;
     int count;
@@ -123,14 +134,16 @@ int main(int argc, char *argv[]) {
                 count ++;
                 field = strtok(NULL, ",");
             }
-        } else if (strcmp(argv[i], "-d") == 0) {
+        } else if (strcmp(argv[i], "-d") == 0 || strcmp(argv[i], "-D") == 0) {
             if (t) {
                 dprintf(2, "Error: already set delim char\n");
                 return -1;
             }
+            if (argv[i][1] == 'D')
+                split_flag = APART_SPLIT;
             i++;
             if (i >= argc) {
-                dprintf(2, "Error: -d must with delim char\n");
+                dprintf(2, "Error: -d/D must with delim char\n");
                 return -1;
             }
             t = argv[i];
@@ -160,7 +173,7 @@ int main(int argc, char *argv[]) {
     if (errb == NULL)
         goto end_apart;
 
-    if (apart_text(&vh, buffer, t) < 0)
+    if (apart_text(&vh, buffer, t, split_flag) < 0)
         goto end_apart;
 
     out_apart(&vh);
