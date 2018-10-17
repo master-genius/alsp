@@ -32,7 +32,7 @@
 
 struct TRoot {
     char type;
-    char name[256];
+    char name[64];
     char idstr[32];
 };
 
@@ -90,3 +90,4 @@ struct Aircraft {
 
 
 #endif
+

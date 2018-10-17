@@ -42,7 +42,6 @@ char * __split_core(char *text, const char *dm, char **save) {
             *save = cur;
         }
 
-        //printf("----%s\n", *save);
     } else {
         *save = text + strlen(text);
     }
