@@ -83,8 +83,10 @@ void out_apart(struct vnode_list *vh) {
         i++;
         v = v->next;
     }
-    if (__args[ARGS_NEXTLINE])
-        printf("\n");
+    if (vh->next) {
+        if (__args[ARGS_NEXTLINE])
+            printf("\n");
+    }
 }
 
 void help(){
