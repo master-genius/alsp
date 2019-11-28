@@ -45,7 +45,6 @@ char * __split_core(char *text, const char *dm, char **save) {
     } else {
         *save = text + strlen(text);
     }
-
     return old;
 }
 

@@ -78,7 +78,11 @@ void out_apart(struct vnode_list *vh) {
     int i=1;
     while(v) {
         if (i <= APART_MAX && __col_apart[i] == 1) {
-            printf("%s%c", (char *)v->data, (v->next == NULL || i==__max_field)?'\0':__args[ARGS_JOIN]);
+			if (v->next == NULL || i == __max_field || __args[ARGS_JOIN] == '\0') {
+				printf("%s", (char*)v->data);
+			} else {
+				printf("%s%c", (char *)v->data, __args[ARGS_JOIN]);
+			}
         }
         i++;
         v = v->next;
