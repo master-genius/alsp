@@ -7,19 +7,13 @@
 #include <fcntl.h>
 #include <ctype.h>
 
-
 #define REGEX_CHAR  ".^*$"
-
 //选项：是否把换行符作为结尾
 #define REG_OPT_LNEND   0
-
 #define REG_OPT_UPLOW   1
-
 #define REG_OPT_END     4
 
 int _REG_OPT[REG_OPT_END];
-
-
 
 int matchs(char *regex, char *text);
 int match(char *, char *);
@@ -101,7 +95,6 @@ int matchreg(char *regex, char *text) {
             }
         }
         return matchreg(regex+2, text);
-
     }
 
     if (regex[0] == '.' && (*text!='\0')) {
@@ -117,7 +110,6 @@ int matchchar(char c, char *regex, char *text) {
         && (*text == c || ( _REG_OPT[REG_OPT_UPLOW]==0 && tolower(*text)==tolower(c) ) )
     ) {
         text++;
-
         if (matchreg(regex+1, text))
             return 1;
         else
@@ -129,17 +121,15 @@ int matchchar(char c, char *regex, char *text) {
 
 #define STD_IN_KYBD     1
 #define STD_IN_FIFO     2
-
 #define BUF_LEN     4096
-
 
 #define REGEX_MAX_LEN   128
 
 #define HELP_INFO   "\n\
     -h : help info\n\
     -v : inverse match\n\
+    -l : do not use \\n as endline\n\
     -i : up low \n"
-
 
 int main(int argc, char *argv[]) {
     for(int i=0; i< REG_OPT_END; i++)
