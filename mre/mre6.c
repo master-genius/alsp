@@ -113,7 +113,7 @@ int matchchar(char c, char *regex, char *text) {
         if (matchreg(regex+1, text))
             return 1;
         else
-            return match(regex,text);
+            return matchreg(regex,text);
     }
 
     return 0;
