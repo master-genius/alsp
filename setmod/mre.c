@@ -99,7 +99,7 @@ int matchchar(char c, char *regex, char *text, int uplow) {
         if (matchreg(regex+1, text, uplow))
             return 1;
         else
-            return match(regex,text, uplow);
+            return matchreg(regex,text, uplow);
     }
 
     return 0;
