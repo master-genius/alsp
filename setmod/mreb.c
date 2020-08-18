@@ -20,12 +20,15 @@ int matchs(char *regex, char *text);
 int match(char *, char *);
 int matchreg(char *, char *);
 int matchchar(char, char *, char *);
+int gotomatch(char* regex, char* text);
+
 
 int matchs(char *regex, char *text) {
     char *sub_regex;
     char *tbuf;
 
     sub_regex = strtok(regex, "|");
+
     while(sub_regex!=NULL) {
         tbuf = text;
         if (match(sub_regex, tbuf)) {
@@ -43,37 +46,31 @@ int match(char *regex, char *text) {
         start_regex = regex;
     }
 
-    int i=0;
-
-    if (regex[0] == '^')
+    if (regex[0] == '^') {
         return matchreg(regex+1, text);
-    else if(strchr(REGEX_CHAR, regex[0]) == NULL) {
-        if (regex[i]=='\\')
-            i++;
-
-        while((*text != '\0' && !(_REG_OPT[REG_OPT_LNEND] && *text == '\n'))
-            &&
-            (_REG_OPT[REG_OPT_UPLOW] ? (*text != regex[i]) : (tolower(*text)!=tolower(regex[i])) )
-        ) {
-            text++;
-        }
     }
-    return matchreg(regex, text);
+	
+	return gotomatch(regex, text);
 }
 
 int gotomatch(char* regex, char* text) {
-    int i=0;
-    if(strchr(REGEX_CHAR, regex[0]) == NULL) {
-        if (regex[i]=='\\')
+
+    int i = 0;
+
+    if (strchr(REGEX_CHAR, regex[0]) == NULL) {
+
+        if (regex[i]=='\\') {
             i++;
+		}
 
         while((*text != '\0' && !(_REG_OPT[REG_OPT_LNEND] && *text == '\n'))
           &&
-          (_REG_OPT[REG_OPT_UPLOW]?(*text != regex[i]):(tolower(*text)!=tolower(regex[i])) )
-        ) {
+          (_REG_OPT[REG_OPT_UPLOW]?(*text != regex[i]):(tolower(*text)!=tolower(regex[i])) ) ) {
+
             text++;
         }
     }
+
     return matchreg(regex, text);
 }
 
@@ -130,12 +127,13 @@ int matchreg(char *regex, char *text) {
 
 int matchchar(char c, char *regex, char *text) {
     while((*text != '\0')
-        && (*text == c || ( _REG_OPT[REG_OPT_UPLOW]==0 && tolower(*text)==tolower(c) ) )
-    ) {
+      && (*text == c || ( _REG_OPT[REG_OPT_UPLOW]==0 && tolower(*text)==tolower(c) ) ) ) {
+
         text++;
-        if (matchreg(regex+1, text))
+
+        if (matchreg(regex+1, text)) {
             return 1;
-        else {
+		} else {
             if (regex == start_regex) {
                 return gotomatch(regex,text);
             }
