@@ -20,7 +20,7 @@ int matchs(char *regex, char *text);
 int match(char *, char *);
 int matchreg(char *, char *);
 int matchchar(char, char *, char *);
-int gotomatch(char* regex, char* text);
+int gotomatch(char *regex, char *text);
 
 
 int matchs(char *regex, char *text) {
@@ -53,7 +53,7 @@ int match(char *regex, char *text) {
 	return gotomatch(regex, text);
 }
 
-int gotomatch(char* regex, char* text) {
+int gotomatch(char *regex, char *text) {
 
     int i = 0;
 
@@ -88,8 +88,8 @@ int matchreg(char *regex, char *text) {
     }
 
     if (regex[1] == '*') {
-        if (regex[0]=='.') {
-            while(*text!='\0') {
+        if (regex[0] == '.') {
+            while(*text != '\0') {
                 if (matchreg(regex+2, text))
                     return 1;
                 text++;

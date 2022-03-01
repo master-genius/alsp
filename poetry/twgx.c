@@ -161,7 +161,7 @@ int main(int argc, char *argv[]) {
                 row = top;
                 col -= 3;
             }
-            if (col <= 4) {
+            if (col < 4) {
                 col = ws[1] - 1;
                 scrn ++;
                 scroll_down(ws[0]);
